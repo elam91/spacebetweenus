@@ -5,7 +5,7 @@ import time
 import random
 
 pygame.font.init()
-WIDTH, HEIGHT = 750, 750
+WIDTH, HEIGHT = 1500, 1500
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Monkey Fracas Jr.")
 

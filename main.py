@@ -7,9 +7,11 @@ import random
 pygame.display.init()
 pygame.font.init()
 DISPLAY = pygame.display.Info()
-WIDTH, HEIGHT = DISPLAY.current_w, DISPLAY.current_h
-WIN = pygame.display.set_mode((WIDTH, HEIGHT),pygame.FULLSCREEN,pygame.DOUBLEBUF)
-pygame.display.set_caption("Monkey Fracas Jr.")
+#WIDTH, HEIGHT = DISPLAY.current_w, DISPLAY.current_h
+WIDTH, HEIGHT = 750,750
+WIN = pygame.display.set_mode((WIDTH, HEIGHT))
+#WIN = pygame.display.set_mode((WIDTH, HEIGHT),pygame.FULLSCREEN,pygame.DOUBLEBUF)
+pygame.display.set_caption("Space Between Us")
 
 # Player Spaceship
 MAIN_SPACE_SHIP = pygame.transform.scale2x(pygame.image.load(os.path.join("assets", "main_ship.png")))
@@ -378,9 +380,9 @@ def text_objects(text, font):
 
 
 def message_display(text):
-    big_font = pygame.font.Font(os.path.join("assets", "pixel.otf"), 50)
+    big_font = pygame.font.Font(os.path.join("assets", "pixel.ttf"), 50)
     if len(text) > 10:
-        big_font = pygame.font.Font(os.path.join("assets", "pixel.otf"), 40)
+        big_font = pygame.font.Font(os.path.join("assets", "pixel.ttf"), 40)
     TextSurf, TextRect = text_objects(text, big_font)
     TextRect.center = ((WIDTH // 2), (HEIGHT // 2))
     WIN.blit(TextSurf, TextRect)
@@ -392,8 +394,8 @@ def main():
     player = Player(300, 630)
     level = 0
     lives = 5
-    main_font = pygame.font.Font(os.path.join("assets", "pixel.otf"), 25)
-    big_font = pygame.font.Font(os.path.join("assets", "pixel.otf"), 50)
+    main_font = pygame.font.Font(os.path.join("assets", "pixel.ttf"), 25)
+    big_font = pygame.font.Font(os.path.join("assets", "pixel.ttf"), 50)
     enemies = []
     wave_length = 5
     enemy_vel = 1
@@ -573,12 +575,15 @@ def main():
 
 
 def main_menu():
-    title_font = pygame.font.Font(os.path.join("assets", "pixel.otf"), 30)
+    title_font = pygame.font.Font(os.path.join("assets", "pixel.ttf"), 30)
+    main_title_font =pygame.font.Font(os.path.join("assets", "pixel2.otf"), 45)
     run = True
     while run:
         WIN.blit(BG, (0, 0))
+        main_title_label =main_title_font.render("Space Between Us",1,(255,255,255))
         title_label = title_font.render("Press any key to begin...", 1, (255, 255, 255))
-        WIN.blit(title_label, (WIDTH // 2 - title_label.get_width() / 2, 350))
+        WIN.blit(title_label, (WIDTH // 2 - title_label.get_width() // 2, WIDTH//2+title_label.get_height()*2))
+        WIN.blit(main_title_label,(WIDTH // 2 - main_title_label.get_width() // 2,WIDTH//2))
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -591,7 +596,7 @@ def main_menu():
 def pause():
     run = True
     while run:
-        title_font = pygame.font.Font(os.path.join("assets", "pixel.otf"), 30)
+        title_font = pygame.font.Font(os.path.join("assets", "pixel.ttf"), 30)
         WIN.blit(BG, (0, 0))
         title_label = title_font.render("Press any key to continue", 1, (255, 255, 255))
         WIN.blit(title_label, (WIDTH // 2 - title_label.get_width() / 2, 350))

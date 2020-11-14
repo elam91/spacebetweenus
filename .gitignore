@@ -1,2 +1,6 @@
 gamevenv
 .idea
+venv
+dist
+build
+main.spec

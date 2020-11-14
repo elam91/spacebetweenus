@@ -4,14 +4,17 @@ import os
 import time
 import random
 
+if getattr(sys, 'frozen', False):
+    os.chdir(sys._MEIPASS)
 pygame.display.init()
 pygame.font.init()
 DISPLAY = pygame.display.Info()
-#WIDTH, HEIGHT = DISPLAY.current_w, DISPLAY.current_h
-WIDTH, HEIGHT = 750,750
-WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-#WIN = pygame.display.set_mode((WIDTH, HEIGHT),pygame.FULLSCREEN,pygame.DOUBLEBUF)
+WIDTH, HEIGHT = DISPLAY.current_w, DISPLAY.current_h
+WIN = pygame.display.set_mode((WIDTH, HEIGHT),pygame.SCALED | pygame.NOFRAME)
+
 pygame.display.set_caption("Space Between Us")
+
+
 
 # Player Spaceship
 MAIN_SPACE_SHIP = pygame.transform.scale2x(pygame.image.load(os.path.join("assets", "main_ship.png")))
@@ -49,6 +52,69 @@ ROCKET_SMALL = pygame.image.load(os.path.join("assets", "rocketsmall.png"))
 
 # Background
 BG = pygame.transform.scale(pygame.image.load(os.path.join("assets", "background-black.png")), (WIDTH, HEIGHT))
+
+# Cinematic
+CIN_BG = pygame.transform.scale(pygame.image.load(os.path.join("assets", "cinematicbg.png")), (WIDTH, HEIGHT))
+CIN_STARS = pygame.transform.scale(pygame.image.load(os.path.join("assets", "cinematicstars.png")), (WIDTH, HEIGHT))
+
+STAR1_1 = pygame.image.load(os.path.join("assets","star1" ,"star1.png"))
+STAR1_2 = pygame.image.load(os.path.join("assets","star1" ,"star2.png"))
+STAR1_3 = pygame.image.load(os.path.join("assets","star1" ,"star3.png"))
+STAR1_4 = pygame.image.load(os.path.join("assets","star1" ,"star4.png"))
+STAR1_5 = pygame.image.load(os.path.join("assets","star1" ,"star5.png"))
+STAR1_6 = pygame.image.load(os.path.join("assets","star1" ,"star6.png"))
+STAR1_7 = pygame.image.load(os.path.join("assets","star1" ,"star7.png"))
+STAR1_8 = pygame.image.load(os.path.join("assets","star1" ,"star8.png"))
+
+STAR2_1 = pygame.transform.scale2x(pygame.image.load(os.path.join("assets","star2" ,"star1.png")))
+STAR2_2 = pygame.transform.scale2x(pygame.image.load(os.path.join("assets","star2" ,"star2.png")))
+STAR2_3 = pygame.transform.scale2x(pygame.image.load(os.path.join("assets","star2" ,"star3.png")))
+STAR2_4 = pygame.transform.scale2x(pygame.image.load(os.path.join("assets","star2" ,"star4.png")))
+STAR2_5 = pygame.transform.scale2x(pygame.image.load(os.path.join("assets","star2" ,"star5.png")))
+STAR2_6 = pygame.transform.scale2x(pygame.image.load(os.path.join("assets","star2" ,"star6.png")))
+STAR2_7 = pygame.transform.scale2x(pygame.image.load(os.path.join("assets","star2" ,"star7.png")))
+STAR2_8 = pygame.transform.scale2x(pygame.image.load(os.path.join("assets","star2" ,"star7.png")))
+
+COMET1 = pygame.image.load(os.path.join("assets","comet" ,"comet1.png"))
+COMET2 = pygame.image.load(os.path.join("assets","comet" ,"comet2.png"))
+COMET3 = pygame.image.load(os.path.join("assets","comet" ,"comet3.png"))
+COMET4 = pygame.image.load(os.path.join("assets","comet" ,"comet4.png"))
+COMET5 = pygame.image.load(os.path.join("assets","comet" ,"comet5.png"))
+COMET6 = pygame.image.load(os.path.join("assets","comet" ,"comet6.png"))
+COMET7 = pygame.image.load(os.path.join("assets","comet" ,"comet7.png"))
+COMET8 = pygame.image.load(os.path.join("assets","comet" ,"comet8.png"))
+
+DAVID = pygame.image.load(os.path.join("assets", "david.png"))
+JONATHAN = pygame.image.load(os.path.join("assets", "jonathan.png"))
+
+if WIDTH > 1000 and HEIGHT > 1000:
+    DISPLAY_MODE = 2
+else:
+    DISPLAY_MODE = 1
+
+class StarSprite:
+    STAR1_LIST = [STAR1_1,STAR1_2,STAR1_3,STAR1_4,STAR1_5,STAR1_6,STAR1_7,STAR1_8]
+    STAR2_LIST = [STAR2_1,STAR2_2,STAR2_3,STAR2_4,STAR2_5,STAR2_6,STAR2_7,STAR2_8]
+    COMET_LIST = [COMET1,COMET2,COMET3,COMET4,COMET5,COMET6,COMET7,COMET8]
+    def __init__(self,arg,x,y):
+        self.x = x
+        self.y = y
+        self.frame = 0
+        if arg == 'comet':
+            self.img_list = self.COMET_LIST
+        elif arg == 'star1':
+            self.img_list = self.STAR1_LIST
+        elif arg == 'star2':
+            self.img_list = self.STAR2_LIST
+        else:
+            self.img_list = []
+
+    def draw(self,window):
+        window.blit(self.img_list[self.frame//3],(self.x,self.y))
+        self.frame += 1
+        if self.frame // 3 > 7:
+            self.frame = 0
+
 
 class PowerUp:
     def __init__(self,x,y,img):
@@ -379,10 +445,35 @@ def text_objects(text, font):
     return textSurface, textSurface.get_rect()
 
 
+def cinematic_story_display(text,surface,x,y,type1='story'):
+    story_font = pygame.font.Font(os.path.join("assets", "pixel.ttf"), 25 * DISPLAY_MODE)
+    speech_font = pygame.font.Font(os.path.join("assets", "pixel.ttf"), 15 * DISPLAY_MODE)
+    if type1 == 'story':
+        font = story_font
+    elif type1 == 'speech':
+        font = speech_font
+    words = [word.split(' ') for word in text.splitlines()]
+    space = font.size(' ')[0]  # The width of a space.
+    max_width, max_height = WIDTH-10, HEIGHT-10
+    pos = x,y
+    for line in words:
+        for word in line:
+            word_surface = font.render(word, 1, (255,255,255))
+            word_width, word_height = word_surface.get_size()
+            surface.blit(word_surface, (x, y))
+            x += word_width + space
+            if x + word_width >= max_width:
+                x = pos[0]  # Reset the x.
+                y += word_height  # Start on new row.
+
+        x = pos[0]  # Reset the x.
+        y += word_height  # Start on new row.
+
+
 def message_display(text):
-    big_font = pygame.font.Font(os.path.join("assets", "pixel.ttf"), 50)
+    big_font = pygame.font.Font(os.path.join("assets", "pixel.ttf"), 70*DISPLAY_MODE)
     if len(text) > 10:
-        big_font = pygame.font.Font(os.path.join("assets", "pixel.ttf"), 40)
+        big_font = pygame.font.Font(os.path.join("assets", "pixel.ttf"), 50*DISPLAY_MODE)
     TextSurf, TextRect = text_objects(text, big_font)
     TextRect.center = ((WIDTH // 2), (HEIGHT // 2))
     WIN.blit(TextSurf, TextRect)
@@ -394,8 +485,8 @@ def main():
     player = Player(300, 630)
     level = 0
     lives = 5
-    main_font = pygame.font.Font(os.path.join("assets", "pixel.ttf"), 25)
-    big_font = pygame.font.Font(os.path.join("assets", "pixel.ttf"), 50)
+    main_font = pygame.font.Font(os.path.join("assets", "pixel.ttf"), 35*DISPLAY_MODE)
+    big_font = pygame.font.Font(os.path.join("assets", "pixel.ttf"), 50*DISPLAY_MODE)
     enemies = []
     wave_length = 5
     enemy_vel = 1
@@ -433,9 +524,7 @@ def main():
 
         if main.display_level_text:
             if level % 5 == 0:
-                message_display(f"""
-                Level {level} - BOSS FIGHT 
-                """)
+                message_display(f"Level {level} - BOSS FIGHT")
             else:
                 message_display(f"Level {level}")
             if ((time.time() - start_time) > 3):
@@ -575,36 +664,163 @@ def main():
 
 
 def main_menu():
-    title_font = pygame.font.Font(os.path.join("assets", "pixel.ttf"), 30)
-    main_title_font =pygame.font.Font(os.path.join("assets", "pixel2.otf"), 45)
     run = True
+    title_font = pygame.font.Font(os.path.join("assets", "pixel.ttf"), 30*DISPLAY_MODE)
+    main_title_font = pygame.font.Font(os.path.join("assets", "pixel2.otf"), 45*DISPLAY_MODE)
+    main_title_label = main_title_font.render("Space Between Us", 1, (255, 255, 255))
+    title_label = title_font.render("Press any key to begin...", 1, (255, 255, 255))
     while run:
         WIN.blit(BG, (0, 0))
-        main_title_label =main_title_font.render("Space Between Us",1,(255,255,255))
-        title_label = title_font.render("Press any key to begin...", 1, (255, 255, 255))
-        WIN.blit(title_label, (WIDTH // 2 - title_label.get_width() // 2, WIDTH//2+title_label.get_height()*2))
-        WIN.blit(main_title_label,(WIDTH // 2 - main_title_label.get_width() // 2,WIDTH//2))
+        WIN.blit(title_label, (WIDTH // 2 - title_label.get_width() // 2, HEIGHT//2+title_label.get_height()*2))
+        WIN.blit(main_title_label,(WIDTH // 2 - main_title_label.get_width() // 2,HEIGHT//2))
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-            if event.type == pygame.KEYDOWN:
-                main()
-
+            elif event.type == pygame.KEYDOWN:
+                cinematic()
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_ESCAPE]:
+            pygame.quit()
     pygame.quit()
+
+def cinematic():
+    FPS = 60
+    frame_time = 0
+    frame = 1
+    clock = pygame.time.Clock()
+    run = True
+    clock.tick(FPS)
+    sprites = []
+    fake_player = Player(WIDTH//2,HEIGHT-MAIN_SPACE_SHIP.get_width())
+    fake_enemies = []
+    for i in range(20):
+        fake_enemies.append(Enemy(random.randint(10*DISPLAY_MODE,WIDTH),random.randint(10*DISPLAY_MODE,HEIGHT),'red'))
+    for i in range(10):
+        sprites.append(StarSprite(random.choice(['star1','star2','comet']),random.randint(10,WIDTH-10),random.randint(10,HEIGHT-10)))
+    skip_font = pygame.font.Font(os.path.join("assets", "pixel.ttf"), 15 * DISPLAY_MODE)
+    speech_font = pygame.font.Font(os.path.join("assets", "pixel.ttf"), 10 * DISPLAY_MODE)
+    main_title_font = pygame.font.Font(os.path.join("assets", "pixel2.otf"), 45 * DISPLAY_MODE)
+    main_title_label = main_title_font.render("Space Between Us", 1, (255, 255, 255))
+    frame4_label = skip_font.render("""But Starbreit will never give up. 
+    He will do whatever it takes to rescue his love.
+    Even now you can hear his voice echo inside the walls of his spaceship.
+     """, 1, (255, 255, 255))
+    frame3_speech = speech_font.render("David, it's time to cross the space between us", 1, (255, 255, 255))
+
+    skip_label = skip_font.render("Press ENTER to skip...", 1, (255, 255, 255))
+    while run:
+
+        if frame == 1:
+            WIN.blit(CIN_BG, (0, 0))
+            WIN.blit(CIN_STARS, (0, 0))
+            WIN.blit(main_title_label, (WIDTH // 2 - main_title_label.get_width() // 2, HEIGHT // 2))
+            WIN.blit(skip_label,
+                 (WIDTH // 2 - skip_label.get_width() // 2, HEIGHT - skip_label.get_height() - 10 * DISPLAY_MODE))
+            frame_time += 1
+            if frame_time > 2*FPS:
+                frame += 1
+                frame_time = 0
+            pygame.display.update()
+        elif frame == 2:
+            WIN.blit(CIN_BG, (0, 0))
+            WIN.blit(CIN_STARS,(0,0))
+            WIN.blit(skip_label,
+                     (WIDTH // 2 - skip_label.get_width() // 2, HEIGHT - skip_label.get_height() - 10 * DISPLAY_MODE))
+            for sprite in sprites:
+                sprite.draw(WIN)
+            cinematic_story_display("""It's the second sunset on planet Querton Utera 7-A,
+where hours from now Jonathan Starbreit will marry his one true love - David Novacohn""",WIN,20,20)
+            pygame.display.update()
+            frame_time +=1
+            if frame_time > 2*FPS:
+                frame += 1
+                frame_time = 0
+        elif frame == 3:
+            WIN.blit(JONATHAN,(10+JONATHAN.get_width(),HEIGHT-JONATHAN.get_height()))
+            cinematic_story_display('I love you David', WIN, JONATHAN.get_width(), (HEIGHT-JONATHAN.get_height())- skip_font.get_height(),'speech')
+            pygame.display.update()
+            frame_time += 1
+            if frame_time > 4*FPS:
+                frame += 1
+                frame_time = 0
+        elif frame == 4:
+            WIN.blit(DAVID,(WIDTH-DAVID.get_width()*2 ,HEIGHT-DAVID.get_height()))
+            cinematic_story_display('I love you too Jonathan', WIN,WIDTH - DAVID.get_width()*2, (HEIGHT - DAVID.get_height()) - skip_font.get_height(), 'speech')
+            pygame.display.update()
+            frame_time += 1
+            if frame_time > 4 * FPS:
+                frame += 1
+                frame_time = 0
+        elif frame == 5:
+            WIN.blit(CIN_BG, (0, 0))
+            WIN.blit(CIN_STARS, (0, 0))
+            cinematic_story_display("""But what's this? An attack by the Xeteros,
+the abominable alien nation that seeks to destroy mankind,
+and the attackers managed to capture David!""", WIN, 20, 20)
+            for enemy in fake_enemies:
+                enemy.move(-10)
+                enemy.draw(WIN)
+            pygame.display.update()
+            frame_time += 1
+            if frame_time > 2 * FPS:
+                frame += 1
+                frame_time = 0
+        elif frame == 6:
+            WIN.blit(CIN_BG, (0, 0))
+            WIN.blit(CIN_STARS, (0, 0))
+            cinematic_story_display("""But Starbreit will never give up.
+He will do whatever it takes to rescue his love.
+Even now you can hear his voice echo inside the
+walls of his spaceship.
+     """, WIN, 20, 20)
+            WIN.blit(JONATHAN, (10 + JONATHAN.get_width(), HEIGHT - JONATHAN.get_height()))
+            cinematic_story_display("""David, my love,
+it's time to cross
+the space between us""", WIN, JONATHAN.get_width(),
+                                    (HEIGHT - JONATHAN.get_height()) - skip_font.get_height()*4, 'speech')
+            fake_player.draw(WIN)
+            fake_player.y -= 100
+            pygame.display.update()
+            frame_time += 1
+            if frame_time > 2 * FPS:
+                frame += 1
+                frame_time = 0
+        elif frame == 7:
+            main()
+
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.KEYDOWN:
+                frame += 1
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_ESCAPE]:
+            run = False
+
+
+
+
 
 def pause():
     run = True
     while run:
-        title_font = pygame.font.Font(os.path.join("assets", "pixel.ttf"), 30)
+        title_font = pygame.font.Font(os.path.join("assets", "pixel.ttf"), 30*DISPLAY_MODE)
+        main_title_font = pygame.font.Font(os.path.join("assets", "pixel2.otf"), 45 * DISPLAY_MODE)
+        main_title_label = main_title_font.render("Space Between Us", 1, (255, 255, 255))
+        paused_label = title_font.render("PAUSED", 1, (255, 255, 255))
         WIN.blit(BG, (0, 0))
         title_label = title_font.render("Press any key to continue", 1, (255, 255, 255))
-        WIN.blit(title_label, (WIDTH // 2 - title_label.get_width() / 2, 350))
+        WIN.blit(main_title_label, (WIDTH // 2 - main_title_label.get_width() // 2, HEIGHT // 2))
+        WIN.blit(title_label, (WIDTH // 2 - title_label.get_width() // 2, HEIGHT // 2+title_label.get_height()*2))
+        WIN.blit(paused_label, (WIDTH // 2 - paused_label.get_width() // 2, HEIGHT // 2 - paused_label.get_height() * 2))
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.KEYDOWN:
                 run = False
+
     return None
 main_menu()
